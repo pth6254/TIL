@@ -1,0 +1,345 @@
+{
+  "name": "lotto_db",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12240a9f-09cc-4891-af3c-3c5f8bf201fb",
+              "name": "회차",
+              "value": "={{ $json['data.list'].ltEpsd }}",
+              "type": "number"
+            },
+            {
+              "id": "39dd672d-b6aa-4061-a1e6-b446b5a95c32",
+              "name": "추첨일자",
+              "value": "={{ $json['data.list'].ltRflYmd }}",
+              "type": "string"
+            },
+            {
+              "id": "a27ffb80-3fcd-4a7f-8291-7c87151c53e1",
+              "name": "당첨번호",
+              "value": "={{ $json['data.list'].tm1WnNo }}{{ $json['data.list'].tm2WnNo }}{{ $json['data.list'].tm3WnNo }}{{ $json['data.list'].tm4WnNo }}{{ $json['data.list'].tm5WnNo }}{{ $json['data.list'].tm6WnNo }}",
+              "type": "number"
+            },
+            {
+              "id": "1af15434-b951-47c4-87e8-c0521b4d3254",
+              "name": "보너스",
+              "value": "={{ $json['data.list'].bnsWnNo }}",
+              "type": "number"
+            },
+            {
+              "id": "a087bcce-9ec3-47e3-bd2a-bceec8492aa1",
+              "name": "1등 당첨자수",
+              "value": "={{ $json['data.list'].rnk1WnNope }}",
+              "type": "number"
+            },
+            {
+              "id": "6edc333f-08a0-49c3-8ed6-20ff99b46ce3",
+              "name": "1등 당첨상금",
+              "value": "={{ $json['data.list'].rnk1WnAmt }}",
+              "type": "number"
+            },
+            {
+              "id": "12d4d1e2-066e-439e-abd0-e0de2ac9b2a0",
+              "name": "2등 당첨자수",
+              "value": "={{ $json['data.list'].rnk2WnNope }}",
+              "type": "number"
+            },
+            {
+              "id": "b3af1e07-b9de-41bc-bb1b-f718e62a2a9c",
+              "name": "2등 당첨상금",
+              "value": "={{ $json['data.list'].rnk2WnAmt }}",
+              "type": "number"
+            },
+            {
+              "id": "6c3199e5-1076-4ad8-90ca-ca4ec055c3a0",
+              "name": "3등 당첨자수",
+              "value": "={{ $json['data.list'].rnk3WnNope }}",
+              "type": "number"
+            },
+            {
+              "id": "abb0a270-f93d-4232-b5b2-8da8bda094bd",
+              "name": "3등 당첨상금",
+              "value": "={{ $json['data.list'].rnk3WnAmt }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        -48
+      ],
+      "id": "d06ea62e-14c4-4aed-bffd-0c65c0044fef",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://www.dhlottery.co.kr/lt645/selectPstLt645Info.do?",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "srchStrLtEpsd",
+              "value": "={{ $json.chatInput - 3 }}"
+            },
+            {
+              "name": "srchEndLtEpsd",
+              "value": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -208,
+        -48
+      ],
+      "id": "bb8587c5-e60b-4a5f-981d-df12924ee84d",
+      "name": "LOTTO"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -464,
+        -48
+      ],
+      "id": "721ab86b-bde6-4473-b66e-b41506fc0806",
+      "name": "When chat message received",
+      "webhookId": "ab8adf20-7e18-4830-aa4b-6eb29fe340d9"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.list",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -48
+      ],
+      "id": "543bb999-cffb-42a4-a5a1-37aa6cbe4c33",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "lotto",
+          "mode": "list",
+          "cachedResultName": "lotto"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "회차": "={{ $json['회차'] }}",
+            "당첨번호": "={{ $json['당첨번호'] }}",
+            "보너스": "={{ $json['보너스'] }}",
+            "1등당첨자수": "={{ $json['1등 당첨자수'] }}",
+            "1등당첨상금": "={{ $json['1등 당첨상금'] }}",
+            "2등당첨자수": "={{ $json['2등 당첨자수'] }}",
+            "2등당첨상금": "={{ $json['2등 당첨상금'] }}",
+            "3등당첨자수": "={{ $json['3등 당첨자수'] }}",
+            "3등당첨상금": "={{ $json['3등 당첨상금'] }}",
+            "추첨일자": "={{ DateTime.fromISO($json['추첨일자']).toISODate() }}"
+          },
+          "matchingColumns": [
+            "회차"
+          ],
+          "schema": [
+            {
+              "id": "회차",
+              "displayName": "회차",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "당첨번호",
+              "displayName": "당첨번호",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "보너스",
+              "displayName": "보너스",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "추첨일자",
+              "displayName": "추첨일자",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "1등당첨자수",
+              "displayName": "1등당첨자수",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "1등당첨상금",
+              "displayName": "1등당첨상금",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "2등당첨자수",
+              "displayName": "2등당첨자수",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "2등당첨상금",
+              "displayName": "2등당첨상금",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "3등당첨자수",
+              "displayName": "3등당첨자수",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "3등당첨상금",
+              "displayName": "3등당첨상금",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        528,
+        -48
+      ],
+      "id": "f680a4c7-9b0b-4dbf-8f0a-b160a40b79a8",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "ux9X1datoXMDaau0",
+          "name": "Postgres DB account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "LOTTO": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "LOTTO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "28f02ea3-c0f3-4691-bff4-873f6beeec61",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "58de867a7262e143f86f29d9ca2bb87a981bf44ee4f7b18564e2b8646d73eaff"
+  },
+  "id": "tyMhrHNuPP41mv1P",
+  "tags": []
+}

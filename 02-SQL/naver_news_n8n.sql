@@ -1,0 +1,20 @@
+-- naver_news_n8n.sql 
+
+DROP TABLE naver_news;
+
+CREATE TABLE naver_news (
+	id 		INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	title 	VARCHAR(300) DEFAULT '' NOT NULL,
+	content TEXT NOT NULL DEFAULT '',
+	section VARCHAR(10) NOT NULL DEFAULT ''
+);
+
+INSERT INTO naver_news (title, content, section)
+VALUES ('테스트기사', '테스트 테스트', '테스트')
+
+SELECT * FROM naver_news;
+
+
+SELECT *
+FROM news
+WHERE title LIKE '%query%' LIMIT '%display%' OFFSET ''
